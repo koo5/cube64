@@ -30,8 +30,6 @@ void boing(byte boing)
   digitalWrite(shiftPin,1);
 }
 
-float b;
-
 byte indata[4];
 
 void loop() {
@@ -50,7 +48,7 @@ void loop() {
   static int layer=0;
 
   for (int x = 0; x < w; x++)
-    boing(1);//leds[x][layer]);
+    boing(leds[x][layer]);
 
   for(int y=0;y<h;y++)
     boing(y==layer);
@@ -64,8 +62,6 @@ void loop() {
   }
 
   //    leds[random(w)][random(h)]=random(2);
-
-
   /*
   if (Serial.available() > 0) {
    digitalWrite(dataPin, Serial.read());

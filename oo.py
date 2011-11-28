@@ -15,8 +15,9 @@ x=0
 y=15
 w=24
 h=16
-lamp=[" ","1"]
+flop = 0
 i = initscr()
+lamp=[" ","1"]
 
 def write(write):
     o.write(chr(write[0]))
@@ -38,8 +39,6 @@ def setall(wut):
 	for y in range(h):
 	    i.addstr(y,x,lamp[wut])
     o.write(chr(wut<<2))
-
-flop = 0
 
 try:
     i.keypad(1)
@@ -63,4 +62,4 @@ try:
 	    flop = not flop
 finally:
     endwin()
-
+    o.close()
