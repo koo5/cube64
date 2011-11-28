@@ -13,7 +13,9 @@ from curses import *
 
 x=0
 y=15
-
+w=24
+h=16
+lamp=[" ","1"]
 i = initscr()
 
 def write(write):
@@ -25,11 +27,19 @@ def write(write):
     i.addstr(32, 23, bin(write[2])+"     ")
 
 def bang(w):
-    i.addch(y,x,ord([" ","1"][w]))
+    i.addch(y,x,ord(lamp[w]))
     write([(x<<2)|0b01,(y<<2)|0b10,(w<<2)|0b11])
     i.addstr(30,3,str(x)+"  ")
     i.addstr(30,13,str(y)+"  ")
     i.addstr(30,23,str(w)+"  ")
+
+def setall(wut):
+    for x in range(w):
+	for y in range(h):
+	    i.addstr(y,x,lamp[wut])
+    o.write(chr(wut<<2))
+
+flop = 0
 
 try:
     i.keypad(1)
@@ -40,14 +50,17 @@ try:
 	k = i.getch()
 	if k == KEY_LEFT and x>0:
 	    x-=1
-	if k == KEY_RIGHT and x<8*3-1:
+	if k == KEY_RIGHT and x<w-1:
 	    x+=1
 	if k == KEY_UP and y>0:
 	    y-=1
-	if k == KEY_DOWN and y<8*2-1:
+	if k == KEY_DOWN and y<h-1:
 	    y+=1
-	if k == ord(" ") or k == 10:
+	if k == 32:
 	    bang ((i.inch()&255) == 32)
+	if k == 10:
+	    setall(flop)
+	    flop = not flop
 finally:
     endwin()
 

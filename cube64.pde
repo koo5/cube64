@@ -5,17 +5,22 @@ const unsigned char w = 8*3;
 const unsigned char h = 8*2;
 byte leds[w][h];
 
+void setall(byte wut)
+{
+  int a;
+  for(int i = 0;i<w;i++)
+  {
+    for(int j = 0;j<h;j++)
+      leds[i][j]=wut;
+  }
+}
+
 void setup() {
   Serial.begin(9600);
   pinMode(dataPin, OUTPUT);
   pinMode(latchPin, OUTPUT);
   pinMode(shiftPin, OUTPUT);
-  int a;
-  for(int i = 0;i<w;i++)
-  {
-    for(int j = 0;j<h;j++)
-      leds[i][j]=0;
-  }
+  setall(0);
 }
 
 void boing(byte boing)
@@ -36,14 +41,16 @@ void loop() {
     byte data = (in&0b11111100)>>2;
     byte meaning = in&0b00000011;
     indata[meaning] = data;
-    if (meaning = 2)        
+    if (meaning == 3)
       leds[min(w,indata[1])][min(h,indata[2])] = indata[3];
+    if(meaning == 0)
+      setall(indata[0]);
   }
 
   static int layer=0;
 
   for (int x = 0; x < w; x++)
-    boing(leds[x][layer]);
+    boing(1);//leds[x][layer]);
 
   for(int y=0;y<h;y++)
     boing(y==layer);
