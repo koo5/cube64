@@ -19,26 +19,27 @@ flop = 0
 i = initscr()
 lamp=[" ","1"]
 
+a = open("log", "a")
+
 def write(write):
-    o.write(chr(write[0]))
-    o.write(chr(write[1]))
-    o.write(chr(write[2]))
-    i.addstr(32, 3, bin(write[0])+"     ")
-    i.addstr(32, 13, bin(write[1])+"     ")
-    i.addstr(32, 23, bin(write[2])+"     ")
+    for i in write:
+	o.write(chr(i))
+	a.write(chr(i))
 
 def bang(w):
+    out = [(x<<2)|0b01,(y<<2)|0b10,(w<<2)|0b11]
+    write(out)
     i.addch(y,x,ord(lamp[w]))
-    write([(x<<2)|0b01,(y<<2)|0b10,(w<<2)|0b11])
-    i.addstr(30,3,str(x)+"  ")
-    i.addstr(30,13,str(y)+"  ")
     i.addstr(30,23,str(w)+"  ")
+    i.addstr(32, 3, bin(out[0])+"     ")
+    i.addstr(32, 13, bin(out[1])+"     ")
+    i.addstr(32, 23, bin(out[2])+"     ")
 
 def setall(wut):
     for x in range(w):
 	for y in range(h):
 	    i.addstr(y,x,lamp[wut])
-    o.write(chr(wut<<2))
+    write([wut<<2])
 
 try:
     i.keypad(1)
@@ -60,6 +61,9 @@ try:
 	if k == 10:
 	    setall(flop)
 	    flop = not flop
+	i.addstr(30,3,str(x)+"  ")
+	i.addstr(30,13,str(y)+"  ")
+
 finally:
     endwin()
     o.close()

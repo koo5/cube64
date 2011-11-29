@@ -1,5 +1,5 @@
 const int dataPin = 11;
-const int latchPin = 12;
+const int latchPin = 9;
 const int shiftPin = 13;
 const unsigned char w = 8*3;
 const unsigned char h = 8*2;
@@ -31,20 +31,9 @@ void boing(byte boing)
 }
 
 byte indata[4];
+int c;
 
 void loop() {
-  if (Serial.available()>0) 
-  {
-    byte in = Serial.read();
-    byte data = (in&0b11111100)>>2;
-    byte meaning = in&0b00000011;
-    indata[meaning] = data;
-    if (meaning == 3)
-      leds[min(w,indata[1])][min(h,indata[2])] = indata[3];
-    if(meaning == 0)
-      setall(indata[0]);
-  }
-
   static int layer=0;
 
   for (int x = 0; x < w; x++)
@@ -53,12 +42,31 @@ void loop() {
   for(int y=0;y<h;y++)
     boing(y==layer);
 
+
   digitalWrite(latchPin,0);
   digitalWrite(latchPin,1);
+
 
   if (++layer == h)
   {
     layer = 7;
+
+    if(c++ == 0x11)
+    {
+      c  =  0;
+
+      if (Serial.available()>0) 
+      {
+        byte in = Serial.read();
+        byte data = (in&0b11111100)>>2;
+        byte meaning = in&0b00000011;
+        indata[meaning] = data;
+        if (meaning == 3)
+          leds[min(w,indata[1])][min(h,indata[2])] = indata[3];
+        if(meaning == 0)
+          setall(indata[0]);
+      }
+    }
   }
 
   //    leds[random(w)][random(h)]=random(2);
@@ -73,6 +81,8 @@ void loop() {
    delay(4);
    }*/
 }
+
+
 
 
 
