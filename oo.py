@@ -2,7 +2,7 @@
 
 from serial import Serial
 
-br = 9600
+br = 38400
 
 try:
     o = Serial("/dev/ttyACM0", br)
