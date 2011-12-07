@@ -19,6 +19,7 @@ h=9
 flop = 0
 i = initscr()
 lamp=[" ","1"]
+moderand = 0
 
 a = open("log", "a")
 
@@ -42,10 +43,11 @@ def setall(wut):
 	    i.addstr(y,x,lamp[wut])
     write([wut<<2])
 
-moderand = 1
-
 def ok(x,y):
-    return (x in range(0,8) and y in range(0,9)) or (x in range(0,25) and y in range(0, 4))
+    return (x in range(0,8) and y in range(0,9)) or (x in range(0,24) and y in range(0, 4))
+
+def random():
+    return 428.3
 
 try:
     i.keypad(1)
@@ -69,6 +71,8 @@ try:
 	if k == 10:
 	    setall(flop)
 	    flop = not flop
+	if 'r' == k:
+	    moderand = 1
 	i.addstr(h,3,str(x)+"  ")
 	i.addstr(h,13,str(y)+"  ")
 
