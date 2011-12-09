@@ -1,7 +1,10 @@
 #include <SPI.h>
+
+//int cubelayers[4] = {0,2,3,1};
 const int latchPin = 10;
+int random_blinker=1;
 byte outs[9][3];
-byte indata[4];
+byte x=0,y=0;
 int w = 8*3;
 int h = 9;
 
@@ -10,78 +13,85 @@ void setall(byte wut)
     memset(&outs, wut?255:0, 9*3);
 }
 
-
 void setup(void) {
-  Serial.begin(38400);
-  setall(0);
-  pinMode(latchPin, OUTPUT);
+    setall(0);
+    Serial.begin(38400);
+    pinMode(latchPin, OUTPUT);
 //  SPI.setDataMode(SPI_MODE0);
-//  SPI.setBitOrder(MSBFIRST);  
-  SPI.setClockDivider(128);
-  SPI.begin();
+//  SPI.setBitOrder(MSBFIRST);
+    SPI.setClockDivider(8);
+    SPI.begin();
 }
+
+void toggle(byte x, byte y, byte data)
+{
+    byte bit= 1<<(x%8);
+    if (data)
+        outs[y][x/8] = outs[y][x/8] | bit;
+    else
+        outs[y][x/8] = outs[y][x/8] & ~bit;
+}
+
 
 void sup_serial()
 {
-      if (Serial.available()>0) 
-      {
-        byte in = Serial.read();
-        byte data = (in&0b11111100)>>2;
-        byte meaning = in&0b00000011;
-        indata[meaning] = data;
-        if (meaning == 3)
+    if (!Serial.available()) return;
+    byte in = Serial.read();
+    byte data = (in&0b11111100)>>2;
+    byte meaning = in&0b00000011;
+    switch(meaning)
+    {
+    case 0:
+        switch (data)
         {
-    	    int x= min(w-1,indata[1]);
-    	    int y= min(h-1,indata[2]);
-    	    byte bit= 1<<(x%8);
-    	    if (indata[3])
-                outs[y][x/8] = outs[y][x/8] | bit;
-	    else
-                outs[y][x/8] = outs[y][x/8] & ~bit;
+        case 0:
+        case 1:
+            setall(data);
+            break;
+        case 2:
+        case 3:
+            random_blinker=data-2;
+            break;
         }
-        if(meaning == 0)
-          setall(indata[0]);
-      }
+        break;
+    case 1:
+        x = min(w-1,data);
+        break;
+    case 2:
+        y = min(h-1,data);
+        break;
+    case 3:
+        toggle(x,y,data);
+        break;
+    }
 }
 
-int cubelayers[4] = {0,2,3,1};
-
 void loop() {
-  static unsigned int layer;
-  static int animator;
-  
-  digitalWrite(latchPin,0);
+    static int animator;
+    static unsigned int layer;
 
-  int i;
-  for(i=0;i<=2;i++)
-      SPI.transfer(outs[layer][i]);
+    digitalWrite(latchPin,0);
 
-  /*
-  randomSeed((millis())/100+layer);
-  SPI.transfer(1<<random(8));
+    int i;
+    for(i=0; i<=2; i++)
+        SPI.transfer(outs[layer][i]);
 
-  randomSeed((millis())/150+layer*100);
-  SPI.transfer(random(255)&random(255)&random(255));
-  SPI.transfer(random(255)&random(255)&random(255));
-*/
-  SPI.transfer(layer==8?1:0);
-  SPI.transfer((1<<layer)&0b0000000011111111);
+    SPI.transfer(layer==8);
+    SPI.transfer(1<<layer);
 
-  digitalWrite(latchPin,1);
+    digitalWrite(latchPin,1);
 
-  delay(1);
-  
-  if (layer++ == 8)
-  {
-    layer = 0;
+    delay(1);
 
-    if(animator++ == 7)
+    if (layer++ == 8)
     {
-      animator  =  0;
-//      leds[random(w)][random(h)]=random(7);
-      
+        layer = 0;
+        if(animator++ == 7)
+        {
+            animator  =  0;
+            if(random_blinker) toggle(random(w),random(h),random(7));
+        }
+        sup_serial();
     }
-sup_serial();
-  }
 }
 

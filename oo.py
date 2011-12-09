@@ -85,6 +85,10 @@ try:
 	    from random import random
 	if ord('m') == k:
 	    mode = mode_music
+	if ord(',') == k:
+	    write([2<<2])
+	if ord('.') == k:
+	    write([3<<2])
 	i.addstr(h,3,str(x)+"  ")
 	i.addstr(h,13,str(y)+"  ")
 
